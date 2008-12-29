@@ -1,0 +1,123 @@
+= has_slug
+
+== Description
+
+has_slug is a plugin that add's slugging capabilities to ActiveRecord models. 
+It allows you to create SEO friendly URL's that will work the same as the 
+numeric defaults Rails provides you.
+
+Using has_slug, you can make this:
+
+  http://example.com/articles/1
+
+Look like this:
+
+  http://example.com/articles/1-first-post
+
+Or even better:
+
+  http://example.com/articles/first-post
+
+has_slug is inspired by friendly_id (http://github.com/norman/friendly_id/tree/master),
+but instead of adding a new table for the slugs it uses a single column per model.
+
+=== Why?
+
+* Text-based id's look better
+* They make URL's easier to remember.
+* They give no hint about the number of records in your database.
+* They are better for search engine optimization.
+
+=== But ...
+
+* It can be tricky to ensure they're always unique.
+* They can change, breaking your URL's and your SEO.
+* They can conflict with your application's namespace.
+
+has_slug takes care of creating unique slugs by using a counter. The first time
+a slug is generated for "Some Title", it will become "some-title". The second 
+time this is done, it will use the slug "some-title_2".
+
+has_slug DOES NOT take care of changing slugs! If you need to care of this, 
+either use the friendly_id plugin, which DOES take care of this, or use a 
+custom solution.
+
+has_slug also doesn't  take care of the namespace conflicts (a slug named 
+'new' for instance), you could use the following technique if this is 
+required: http://henrik.nyh.se/2008/10/validating-slugs-against-existing-routes-in-rails
+
+== Usage
+
+=== Typical usage (with slug column)
+
+Blog posts have a distinct, but not necessarily unique title stored in a column
+in the database. If we add a slug column to the posts table, we can use has_slug
+to generate slugs automatically.
+
+  class Post < ActiveRecord::Base
+    has_slug :title
+  end
+
+We can then use the standard url helpers to generate a SEO friendly URL:
+
+  @post_1 = Post.create(:title       => 'First Post',
+                        :description => 'Description ...')
+
+  @post_2 = Post.create(:title       => 'First Post',
+                        :description => 'Description ...')
+
+  url_for(@post_1)
+  # => http://example.com/posts/first-post
+
+  url_for(@post_2)
+  # => http://example.com/posts/first-post_2
+  
+And use the standard finder to find the corresponding post:
+
+  @post = Post.find('first-post')
+
+You can also use the <code>found_by_slug?</code> method to find out if the 
+record was found by the slug. You could use this to redirect to the URL with 
+the slug for SEO purposes.
+
+  redirect_to(@post, :status => 301) unless @post.found_by_slug?
+
+== Typical usage (without slug column)
+
+We can also use has_slug without adding the slug column. If we do this, the id
+of the record is prepended to the slug.
+
+  @post = Post.find(1)
+  
+  url_for(@post)
+  # => http://example.com/posts/1-first-post
+
+== Scoped usage
+
+Restaurants belong to a city. They have a unique name, but only in the city they
+are in. If we add a slug column to the restaurants table, we can use has_slug
+to generate scoped slugs automatically.
+
+  class Restaurant < ActiveRecord::Base
+    belongs_to :city
+    
+    has_slug :name, :scope => :city
+  end
+
+We can then use the standard url helpers to generate a SEO friendly URL:
+
+  @restaurant_1 = Restaurant.create(:name => 'Da Marco',
+                                    :city => City.find('new-york'))
+  
+  @restaurant_2 = Restaurant.create(:name => 'Da Marco',
+                                    :city => City.find('san-fransisco'))
+
+  url_for(@restaurant_1.city, @restaurant)
+  # => http://example.com/cities/new-york/restaurants/da-marco
+  
+  url_for(@restaurant_2.city, @restaurant)
+  # => http://example.com/cities/san-fransisco/restaurants/da-marco
+
+== Authors
+
+* Tom-Eric Gerritsen (tomeric@i76.nl)

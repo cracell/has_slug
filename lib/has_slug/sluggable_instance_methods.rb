@@ -22,7 +22,8 @@ module HasSlug::SluggableInstanceMethods
   end
   
   def new_slug_needed?
-    self.new_record? || self.sluggable.to_slug != self.slug
+    !self.send("#{self.class.has_slug_options[:slug_column]}_changed?") &&
+    (self.new_record? || self.send("#{self.class.has_slug_options[:attribute]}_changed?"))
   end
   
   def to_param

@@ -60,7 +60,7 @@ class HasSlugTest < Test::Unit::TestCase
     context 'with a slug column' do
       setup do
         @new_york      = Factory(:city, :name => 'New York')
-        @san_Francisco = Factory(:city, :name => 'San Francisco')
+        @san_francisco = Factory(:city, :name => 'San Francisco')
       end
       
       context 'and a custom slug' do
@@ -88,20 +88,29 @@ class HasSlugTest < Test::Unit::TestCase
         
         should 'create the same slug in a different scope' do
           @da_marco_2 = Factory(:restaurant, :name => 'Da Marco',
-                                             :city => @san_Francisco)
+                                             :city => @san_francisco)
           
           assert_equal @da_marco_2.slug, @da_marco.slug
+        end
+        
+        should 'not create duplicate slugs' do
+          @da_marco_2 = Factory(:restaurant, :name => 'Da Marco',
+                                             :city => @new_york)          
+          assert_not_equal @da_marco_2.slug, @da_marco.slug
+          
+          @da_marco_2.update_attributes(:city => @san_fransisco)          
+          assert_equal @da_marco_2.slug, @da_marco.slug    
         end
       end
       
       should 'set the slug' do
         assert_equal 'new-york',      @new_york.slug
-        assert_equal 'san-francisco', @san_Francisco.slug
+        assert_equal 'san-francisco', @san_francisco.slug
       end
       
       should 'return the slug on call to #to_param' do
         assert_equal @new_york.slug,      @new_york.to_param
-        assert_equal @san_Francisco.slug, @san_Francisco.to_param
+        assert_equal @san_francisco.slug, @san_francisco.to_param
       end
       
       should 'not create duplicate slugs' do
@@ -125,21 +134,21 @@ class HasSlugTest < Test::Unit::TestCase
       end
       
       should 'still find some by id' do
-        cities = City.find([@new_york.id, @san_Francisco.id])
+        cities = City.find([@new_york.id, @san_francisco.id])
         
         assert_equal 2, cities.length
         assert !cities.any?(&:found_by_slug?)
       end
       
       should 'find some by slug' do
-        cities = City.find([@new_york.slug, @san_Francisco.slug])
+        cities = City.find([@new_york.slug, @san_francisco.slug])
         
         assert_equal 2, cities.length
         assert cities.all?(&:found_by_slug?)
       end
       
       should 'find some by id or slug' do
-        cities = City.find([@new_york.id, @san_Francisco.slug])
+        cities = City.find([@new_york.id, @san_francisco.slug])
         
         assert_equal 2, cities.length
         assert !cities[0].found_by_slug?

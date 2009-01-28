@@ -7,6 +7,22 @@ module HasSlug::SluggableClassMethods
     end
   end
   
+  def slug_scope_attribute
+    return @@slug_scope_attribute if defined?(@@slug_scope_attribute)
+
+    if scope = has_slug_options[:scope]
+      if columns.any? { |c| c.name == scope }
+        @@slug_scope_attribute = scope.to_sym
+      elsif columns.any? { |c| c.name == "#{scope}_id" }
+        @@slug_scope_attribute = "#{scope}_id".to_sym
+      else
+        raise Exception, "has_slug's scope '#{scope}' does not exist in the model '#{self.class.to_s}'"
+      end
+    end
+    
+    @@slug_scope_attribute
+  end
+  
   # Find a single record that has the same slug as the given record's slug
   def find_one_with_same_slug(object)
     slug_column = has_slug_options[:slug_column]
@@ -16,11 +32,8 @@ module HasSlug::SluggableClassMethods
                                      end
 
     if scope = has_slug_options[:scope]
-      scope_attribute = "#{scope}_id" if !columns.any? { |c| c.name == scope } &&
-                                          columns.any? { |c| c.name == "#{scope}_id" }
-
-      result = send("find_by_#{slug_column}_and_#{scope_attribute}",
-                 object.slug, object.send(scope), options)
+      result = send("find_by_#{slug_column}_and_#{slug_scope_attribute}",
+                    object.slug, object.send(scope), options)
     else
       result = send("find_by_#{slug_column}", object.slug, options)
     end

@@ -46,7 +46,8 @@ module HasSlug
         extend SluggableClassMethods
         include SluggableInstanceMethods
         
-        before_save :set_slug, :if => :new_slug_needed?
+        before_save :set_slug,
+                    :if => :new_slug_needed?
       else
         require 'has_slug/not_sluggable_class_methods'
         require 'has_slug/not_sluggable_instance_methods'

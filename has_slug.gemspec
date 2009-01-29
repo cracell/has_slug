@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{has_slug}
-  s.version = "0.1.3"
+  s.version = "0.1.4"
   
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.rubygems_version = %q{1.3.1}
@@ -21,7 +21,8 @@ Gem::Specification.new do |s|
   s.test_files = 
     ["test/schema.rb", "test/test_helper.rb", "test/factories/city_factory.rb",
      "test/factories/kitchen_factory.rb", "test/factories/restaurant_factory.rb", "test/models/city.rb",
-     "test/models/kitchen.rb", "test/models/restaurant.rb", "test/unit/has_slug_test.rb"]
+     "test/models/kitchen.rb", "test/models/restaurant.rb", "test/unit/has_slug_test.rb",
+     "test/unit/slug_test.rb"]
   
   s.has_rdoc = true
   s.rdoc_options = ["--main", "README.rdoc"]

@@ -9,7 +9,7 @@ class String
     slug.downcase!
     
     # Change seperators (like spaces) to dashes
-    slug.gsub!(/[+_,\.\/|;; ]/, '-')
+    slug.gsub!(/[+_',\.\/|;; ]/, '-')
     
 		# Dot's should be saved only when they have letter or number on both sides
 		# (this preserves file extensions)

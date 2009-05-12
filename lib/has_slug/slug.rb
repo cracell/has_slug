@@ -25,6 +25,9 @@ class String
     slug.gsub!(/^\.+/, '')
     slug.gsub!(/\.+$/, '')
     
+    #turn other dots to dashes
+    slug.gsub!(/\./, '-')
+    
     # Strip dashes from begining and end
     slug.gsub!(/^-(.+)+/, '\1')
     slug.gsub!(/(.+)-+$/, '\1')

@@ -20,9 +20,9 @@ class SlugTest < Test::Unit::TestCase
       assert_equal 'internationalization', "Iñtërnâtiônàlizâtiôn".to_slug 
     end
     
-    should 'preserve dots that have numbers or letters on both sides' do
-      assert_equal 'filename.1',   "filename.1".to_slug
-      assert_equal 'filename.txt', "filename.txt".to_slug
+    should 'turn dots into dashes' do
+      assert_equal 'filename-1',   "filename.1".to_slug
+      assert_equal 'filename-txt', "filename.txt".to_slug
       
       assert_equal 'a-sentence', "A sentence.".to_slug
       assert_equal 'a-sentence-a-new-sentence', "A sentence. A new sentence.".to_slug
